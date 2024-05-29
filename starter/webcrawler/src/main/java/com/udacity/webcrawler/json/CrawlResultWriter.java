@@ -30,15 +30,11 @@ public final class CrawlResultWriter {
    *
    * @param path the file path where the crawl result data should be written.
    */
-  public void write(Path path) throws IOException {
-    BufferedWriter writer = null;
-    try {
-       writer = Files.newBufferedWriter(path);
+  public void write(Path path) {
+    try (BufferedWriter writer = Files.newBufferedWriter(path)) {
       this.write(writer);
     } catch (IOException e) {
-      throw new RuntimeException();
-    }finally {
-      writer.close();
+      throw new RuntimeException("Writing data is failed");
     }
   }
 

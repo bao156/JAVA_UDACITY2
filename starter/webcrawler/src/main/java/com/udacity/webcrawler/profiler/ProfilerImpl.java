@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -49,16 +50,15 @@ final class ProfilerImpl implements Profiler {
 
   @Override
   public void writeData(Path path) throws IOException {
-    BufferedWriter writer = null;
-    try {
-      writer = Files.newBufferedWriter(path);
+    try (final BufferedWriter writer = Files.newBufferedWriter(
+            path,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.APPEND
+    )) {
       this.writeData(writer);
-    } catch (IOException e) {
-      throw new RuntimeException();
-    }finally {
-      writer.close();
     }
   }
+
 
   @Override
   public void writeData(Writer writer) throws IOException {

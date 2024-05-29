@@ -30,15 +30,10 @@ public final class ConfigurationLoader {
    * @return the loaded {@link CrawlerConfiguration}.
    */
   public CrawlerConfiguration load() throws IOException {
-    BufferedReader reader = null;
-    try {
-       reader = Files.newBufferedReader(path);
+    try (BufferedReader reader = Files.newBufferedReader(this.path)) {
       return read(reader);
     } catch (IOException e) {
-      throw  new RuntimeException();
-    }
-    finally {
-      reader.close();
+      throw  new RuntimeException("Loading data is failed");
     }
   }
 

@@ -19,27 +19,29 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
     private final ProfilingState profilingState;
     private final Object object;
 
-    ProfilingMethodInterceptor(Clock clock, ProfilingState profilingState, Object object) {
+    ProfilingMethodInterceptor(
+            Clock clock,
+            ProfilingState state,
+            Object target
+    ) {
         this.clock = Objects.requireNonNull(clock);
-        this.profilingState = profilingState;
-        this.object = object;
+        this.profilingState = Objects.requireNonNull(state);
+        this.object = Objects.requireNonNull(target);
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         final Runnable recordState;
-        if (method.getAnnotation(Profiled.class) != null) {
-            final ZonedDateTime startTime = ZonedDateTime.now(this.clock);
-            recordState = () -> this.profilingState.record(object.getClass(), method, Duration.between(startTime, ZonedDateTime.now(this.clock)));
-        } else {
+        if (null == method.getAnnotation(Profiled.class)) {
             recordState = () -> {};
+        } else {
+            final ZonedDateTime startTime = ZonedDateTime.now(this.clock);
+            recordState = () -> this.profilingState.record(object.getClass(), method, Duration.between(startTime, ZonedDateTime.now(this.clock))
+            );
         }
-       return getObject(method, args, recordState);
-    }
 
-    public Object getObject(Method method, Object[] args, Runnable recordState) throws Throwable {
         try {
-            return method.invoke(object, args);
+            return method.invoke(this.object, args);
         } catch (InvocationTargetException ite) {
             throw ite.getTargetException();
         } catch (IllegalAccessException | UndeclaredThrowableException e) {

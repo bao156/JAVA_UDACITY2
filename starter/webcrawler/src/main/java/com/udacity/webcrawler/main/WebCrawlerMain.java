@@ -39,16 +39,15 @@ public final class WebCrawlerMain {
         CrawlResultWriter resultWriter = new CrawlResultWriter(result);
         String resultPath = this.config.getResultPath();
         String profileOutputPath = this.config.getProfileOutputPath();
-        Writer crawlOutputWriter = new OutputStreamWriter(out);
-        Writer profileOutputWriter = new OutputStreamWriter(out);
+        Writer crawAndProfilelOutputWriter = new OutputStreamWriter(out);
         if (resultPath.isBlank()) {
-            resultWriter.write(crawlOutputWriter);
+            resultWriter.write(crawAndProfilelOutputWriter);
         } else {
             resultWriter.write(Path.of(resultPath));
         }
 
         if (profileOutputPath.isBlank()) {
-            this.profiler.writeData(profileOutputWriter);
+            this.profiler.writeData(crawAndProfilelOutputWriter);
         } else {
             this.profiler.writeData(Path.of(profileOutputPath));
         }
